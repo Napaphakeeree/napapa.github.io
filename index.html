@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Style Random Image</title>
+  <link rel="stylesheer" href="index.css">
+  <style>
+    /* พื้นฐานการตั้งค่าสำหรับตัวอักษรและพื้นหลัง */
+    body {
+      font-family: sans-serif;
+      background-image: url('https://i.pinimg.com/736x/60/45/b2/6045b20b691812aa54a1bfcdf3499331.jpg');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #fff;
+    }
+
+    /* กล่องล็อกอินและสมัครสมาชิก */
+    .login-container, .signup-container {
+      background-color: rgba(255, 134, 225, 0.7);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 300px;
+    }
+
+    .login-container h2, .signup-container h2 {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .login-container input[type="text"],
+    .login-container input[type="password"],
+    .signup-container input[type="text"],
+    .signup-container input[type="password"] {
+      width: 93%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .login-container button, .signup-container button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      color: #fff;
+      background-color: #db34cd;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-container button:hover, .signup-container button:hover {
+      background-color: #ff97ff;
+    }
+
+    .signup-link {
+      color: #fff;
+      text-decoration: none;
+      margin-top: 10px;
+      display: block;
+      font-size: 0.9em;
+    }
+
+    /* หน้าแสดงภาพ */
+    #mainContent {
+      display: none;
+      text-align: center;
+    }
+
+    /* รูปภาพในลักษณะการเลือกไพ่ */
+    .card {
+      width: 300px;
+      height: 400px;
+      margin: 10px;
+      background-color: rgba(255, 242, 255, 0.8);;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: inline-block;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+
+    /* สีเมื่อเมาส์ชี้ */
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
+      background-color: rgba(252, 122, 252, 0.8);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .card.flipped img {
+      opacity: 1;
+    }
+
+    /* ตั้งค่าปุ่มการ์ดให้ไม่สามารถคลิกได้จนกว่าจะเริ่มเกม */
+    .card.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    /* ปุ่มสับไพ่ */
+    button#shuffleButton {
+      padding: 20px 30px;
+      font-size: 1em;
+      color: #fff;
+      background-color: #e622bc;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button#shuffleButton:hover {
+      background-color: #e475c8;
+    }
+   
+    /* การแสดงภาพขนาดใหญ่ */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .lightbox img {
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 10px;
+      transform: scale(0);
+      transition: transform 0.5s ease;
+    }
+
+    .lightbox.show img {
+      transform: scale(1);
+    }
+
+    .lightbox .description {
+      color: #fff;
+      font-size: 1.2em;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .menu-container {
+  display: flex; /* ใช้ Flexbox */
+  align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+  justify-content: center; /* จัดกึ่งกลางแนวนอน */
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+}
+    .menu-container button {
+  padding: 15px 30px; /* เพิ่มขนาดของปุ่ม */
+  font-size: 1.5em; /* ปรับขนาดข้อความให้ใหญ่ขึ้น */
+  color: #fff;
+  background-color: #db34cd;
+  border: none;
+  border-radius: 10px; /* ขอบมน */
+  cursor: pointer;
+  transition: background-color 0.10s ease;
+}
+
+.menu-container button:hover {
+  background-color: #ff97ff; /* สีเมื่อเอาเมาส์ชี้ */
+}
+
+.card.flipped {
+      transform: rotateY(180deg);
+    }
+    #lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #lightbox.show {
+      display: flex;
+    }
+    #lightbox img {
+      max-width: 80%;
+      max-height: 80%;
+    }
+    #lightboxDescription {
+      color: rgb(44, 32, 42);
+      text-align: center;
+      margin-top: 10px;
+    }
+    #historyContainer {
+      display: none;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 20%;
+      left: 20%;
+      right: 20%;
+      z-index: 9999;
+    }
+    #historyList {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    button {
+      background-color: #e622bc; 
+      color: white; /* สีตัวอักษร */
+      border: none;
+      padding: 20px 30px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่มเอฟเฟกต์เมื่อชี้ */
+    }
+    /* เปลี่ยนสีปุ่มเมื่อชี้ */
+    button:hover {
+      background-color: #ff97ff; /* สีเขียวเข้มขึ้นเมื่อชี้ */
+      transform: scale(1.05); /* ขยายเล็กน้อย */
+    }
+
+
+    /* การสลับการ์ด */
+    @keyframes shuffleAnimation {
+      0% {
+        transform: rotateY(0deg);
+      }
+      25% {
+        transform: rotateY(90deg);
+      }
+      50% {
+        transform: rotateY(180deg);
+      }
+      75% {
+        transform: rotateY(270deg);
+      }
+      100% {
+        transform: rotateY(360deg);
+      }
+    }
+
+    .card.shuffling {
+      animation: shuffleAnimation 0.8s ease-in-out;
+    }
+
+
+    #historyContainer {
+        background-color: #ffc5f5; 
+        color: #333; 
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(184, 50, 166, 0.2); /* เงา */
+        position: fixed;
+        top: 20%;
+        left: 20%;
+        right: 20%;
+        z-index: 9999;
+        display: none;
+    }
+
+    /* เปลี่ยนสีหัวข้อในหน้าประวัติ */
+    #historyContainer h2 {
+        color: #000000; 
+        font-family: Arial, sans-serif; 
+        text-align: center; /* จัดกึ่งกลาง */
+    }
+
+    /* เปลี่ยนสีของรายการประวัติ */
+    #historyList div {
+        color: #000000; 
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd; /* ขอบ */
+    }
+
+    /* เปลี่ยนสีปุ่มปิด */
+    #historyContainer button {
+        background-color: #db34cd; 
+        color: white; 
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+
+    #historyContainer button:hover {
+        background-color: #ffdeff; 
+    }
+
+
+  /*หน้ายินดีต้อนรับ*/
+  .menu-container {
+      display: none; /* ซ่อนเป็นค่าเริ่มต้น */
+      padding: 70px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(109, 0, 119, 0.2); /* เพิ่มเงา */
+      text-align: center;
+    }
+
+    /* เปลี่ยนสีตัวอักษรใน ยินดีต้อนรับ*/
+    .menu-container h1 {
+      color: #000000; 
+      font-family: 'Arial', sans-serif;
+      font-size: 24px;
+    }
+
+    
+    /* การจัดสไตล์สำหรับ h1 */
+    #mainContent h1 {
+      color: #ffffff; 
+      font-family: 'Arial', sans-serif;
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+   
+
+
+  </style>
+</head>
+<body>
+  
+  <!-- หน้า Login -->
+  <div class="login-container" id="loginContainer">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <a href="javascript:void(0)" class="signup-link" onclick="showSignup()">Don't have an account? Sign Up</a>
+  </div>
+
+  <!-- หน้า Sign Up -->
+  <div class="signup-container" id="signupContainer" style="display:none;">
+    <h2>Sign Up</h2>
+    <input type="text" id="newUsername" placeholder="Username">
+    <input type="password" id="newPassword" placeholder="Password">
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+    <button onclick="signup()">Sign Up</button>
+    <a href="javascript:void(0)" class="signup-link" onclick="showLogin()">Already have an account? Login</a>
+  </div>
+ 
+  <div class="menu-container" id="menuContainer" style="display:none;">
+    <h1>ยินดีต้อนรับสู่การดูดวง</h1>
+  
+    <div>
+    <label for="dob" style="font-size: 1.2em; margin-bottom: 10px; display: block; color: #000000;">กรุณากรอกวันเกิดของคุณ:</label>
+    <input type="date" id="dob" name="dob" 
+      style="padding: 10px; font-size: 1em; width: 100%; border-radius: 10px; border: 1px solid #fff; background-color: rgba(255, 255, 255, 0.7); color: #333; margin-bottom: 20px;">
+  </div>
+ 
+  <button onclick="goToReading()">ดูดวงวันนี้</button>
+  </div>
+
+  <!-- หน้าแสดงรูปภาพสุ่ม -->
+  <div id="mainContent">
+    <h1>ดูดวงวันนี้</h1>
+    <div id="cardsContainer"></div>  
+    <button id="shuffleButton" onclick="shuffleCards()">สลับการ์ด</button>
+    <button onclick="showHistory()">ประวัติการสุ่มการ์ด</button>
+   
+  <div id="historyContainer" style="display:none;">
+      <h2>ประวัติการสุ่มการ์ด</h2>
+      <div id="historyList"></div>
+      <button onclick="closeHistory()">ปิด</button>
+  </div>
+
+    
+  <!-- Lightbox สำหรับแสดงภาพขนาดใหญ่ -->
+<div class="lightbox" id="lightbox">
+    <div class="lightbox-content">
+      <h2 id="lightboxTitle"></h2>
+      <img id="lightboxImage" src="" alt="Large image">
+      <div class="description" id="lightboxDescription"></div>
+    </div>
+  </div>
+  
+  <script>
+ 
+
+    // ฟังก์ชันล็อกอิน
+    function login() {
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      createCards();  // สร้างการ์ดหลังจากล็อกอิน
+    }
+
+    // ฟังก์ชันสมัครสมาชิก
+    function signup() {
+      const newUsername = document.getElementById("newUsername").value;
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (newPassword === confirmPassword) {
+        alert("Account created successfully! Please login.");
+        showLogin();  // เปลี่ยนไปที่หน้า login หลังจากสมัครเสร็จ
+      } else {
+        alert("Passwords do not match!");
+      }
+    }
+    // ฟังก์ชันล็อกอิน -> เปลี่ยนไปหน้าเมนู
+      function login() {
+       document.getElementById("loginContainer").style.display = "none";
+       document.getElementById("menuContainer").style.display = "block"; // แสดงหน้าเมนูหลัก
+    }
+
+    // ฟังก์ชันเปลี่ยนจากหน้าเมนูไปยังหน้าสุ่มไพ่
+    function goToReading() {
+      document.getElementById("menuContainer").style.display = "none";
+      document.getElementById("mainContent").style.display = "block"; // แสดงหน้าสุ่มไพ่
+     createCards(); // สร้างการ์ดสำหรับการสุ่ม
+    }
+
+
+    // ฟังก์ชันแสดงหน้า login
+    function showLogin() {
+      document.getElementById("signupContainer").style.display = "none";
+      document.getElementById("loginContainer").style.display = "block";
+    }
+
+    // ฟังก์ชันแสดงหน้า signup
+    function showSignup() {
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("signupContainer").style.display = "block";
+    }
+    function goToReading() {
+  const dob = document.getElementById('dob').value; // ตรวจสอบค่าวันเกิดจาก input
+  if (dob) {
+    // ถ้ามีการกรอกวันเกิดแล้ว ให้ไปหน้าอ่านไพ่
+    document.getElementById("menuContainer").style.display = "none";
+    document.getElementById("mainContent").style.display = "block"; // แสดงหน้าสุ่มไพ่
+    createCards(); // สร้างการ์ดสำหรับการสุ่ม
+  } else {
+    alert("กรุณากรอกวันเกิดก่อนนะคะ");
+  }
+}
+
+
+
+    // Array ของ URL รูปภาพพร้อมคำอธิบายและหัวข้อ
+const images = [
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/a58ed9f4-ee1c-4174-9fcf-07c3dcf1039e_original.png",
+   title: "THE FOOL", 
+   description: "ความคิดอิสระ ความรักอิสระ ดูไร้เดียงสา ซึ่งจริงๆ ก็อาจจะไม่ได้ไร้เดียงสา หากเลือกว่าเราชอบแล้ว รักแล้ว ที่จะตามสิ่งที่ฝันตามสิ่งที่ชอบ แม้จะประสบความสำเร็จหรือไม่ก็ตาม" 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/1dffc6f7-3a40-48ba-93fa-eadc1365a852_original.png", 
+  title: "THE MAGICIAN", 
+  description: "ที่ได้ไพ่ใบนี้เป็นตัวแทนนั้น จะมีลักษณะฉลาด เข้าใจทุกอย่าง และในความสัมพันธ์เค้าอาจจะใช้ วิธีในความสัมพันธ์ที่ออกจะไม่ซื่อซักหน่อย แต่ก็ไม่ใช่สิ่งไม่ดี เช่น ถ้าจีบก็อาจจะมีการหายไปให้เราคิดถึง" 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/6aeaeb53-e9ec-43dc-a56b-c6e3535d2e8d_original.png", 
+  title: "THE EMPRESS", 
+  description: "ความเป็นแม่สูง ดูแลอย่างดีสมบูรณ์ คนที่เข้ามารักเธอจะยอมเธอทั้งกายและใจ..." 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/90061dd7-bba7-44aa-abb2-459b20fd4379_original.png", 
+  title: "THE EMPEROR", 
+  description: "''ความมั่นคง ความนิ่ง ความเป็นพ่อ ความพร้อมจะดูแลและปกป้องคนที่ตนรัก...การควบคุมและความเป็นเจ้าเข้าเจ้าของ..." 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/531b5580-39dd-481a-9c2b-12d4865bde06_original.png", 
+  title: "THE HIEROPHANT", 
+  description: "ข้อตกลง แนวคิด ความเชื่อที่วางร่วมกันในความสัมพันธ์...อาจหมายถึงคนที่เป็นอาจารย์ ครู ผู้อบรม ที่ปรึกษา หรือคนที่ชอบสั่งสอนให้ความรู้คนได้ครับ" 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/c0cfd55f-5d2d-4236-9346-c53b5345fc2a_original.png", 
+  title: "THE LOVERS", 
+  description: "โอกาส โชคชะตาที่เข้ามา ซึ่งเป็นทางเลือกที่ต้องเลือก..." 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/6c6b243e-3aa8-4183-8e7b-565843d54d54_original.png", 
+  title: "THE CHARIOT", 
+  description: "'ความมุ่งมั่น ความมุทะลุ ในความสัมพันธ์ ที่สามารถควบคุมได้.." 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/3de937ea-23c6-4062-9509-8e3c4e5dfba6_original.png", 
+  title: "THE HERMIT", 
+  description: "การแยกตัวออกมาคนเดียว ออกจากสถานการณ์บางอย่าง เพื่อค้นหาคำตอบด้วยมุมมองที่กว้างขึ้น...'" 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/f18320b0-5d7e-4d01-9c82-e08ddc0da424_original.png", 
+  title: "STRENGTH", 
+  description: "ความเข้มแข็งในการควบคุมจิตใจ ผู้หญิงคนนึงทำให้ผู้ชายยอมสยบได้..." 
+  },
+  { src: "https://cms.dmpcdn.com/horoscope/2019/07/01/c440589c-9047-4380-8aec-dcfe2198301a_original.png", 
+  title: "THE HIGH PRIESTESS", 
+  description: "หมายถึงผู้หญิงคนนี้เป็นคนที่มีเสน่ห์ลึกลับ ซับซ้อน ไม่ชัดเจน แต่มีสัญชาตญาณ ที่ดีมีบุคลิกที่ทำให้ ผู้ชายที่คุณรัก หรือสนใจหลงใหลคุณได้ เหมือนต้องมนต์สะกด" 
+  }
+  
+];
+let history = []; // ตัวแปรเก็บประวัติการสุ่มการ์ด
+
+// ฟังก์ชันที่ใช้เก็บประวัติเมื่อสุ่มการ์ด
+function addToHistory(card, index) {
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleString(); // วันที่และเวลา
+  const historyEntry = {
+    date: formattedDate,
+    title: images[index].title,
+    description: images[index].description,
+    image: images[index].src // เก็บแหล่งที่มาของภาพ
+  };
+  history.push(historyEntry); // เพิ่มลงในประวัติ
+}
+
+// ฟังก์ชันแสดงประวัติการ์ด
+function showHistory() {
+  const historyContainer = document.getElementById("historyContainer");
+  const historyList = document.getElementById("historyList");
+
+  // ล้างประวัติเดิม
+  historyList.innerHTML = '';
+  
+ // แสดงประวัติทั้งหมด
+ if (history.length === 0) {
+    historyList.innerHTML = '<p>ไม่มีประวัติการสุ่มการ์ด</p>'; // ถ้าไม่มีประวัติ
+  } else {
+    history.forEach((entry) => {
+      const historyItem = document.createElement("div");
+      historyItem.innerHTML = `
+        <strong>${entry.date}</strong><br>
+        <img src="${entry.image}" alt="${entry.title}" style="width: 100px;"><br>
+        ${entry.title}: ${entry.description}<br><br>`;
+      historyList.appendChild(historyItem);
+    });
+  }
+
+  // แสดงหน้าประวัติ
+  historyContainer.style.display = "block"; 
+}
+
+// ฟังก์ชันปิดหน้าประวัติ
+function closeHistory() {
+  document.getElementById("historyContainer").style.display = "none";
+}
+
+// ฟังก์ชันที่ใช้เลือกการ์ดและแสดงรายละเอียด
+function selectCard(card, index) {
+  if (cardSelected) return;
+
+  card.classList.add("flipped");
+  cardSelected = true;
+
+  const lightbox = document.getElementById("lightbox");
+  const lightboxTitle = document.getElementById("lightboxTitle");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxDescription = document.getElementById("lightboxDescription");
+
+  lightboxTitle.textContent = images[index].title; // แสดงหัวข้อ
+  lightboxImage.src = images[index].src;
+  lightboxDescription.textContent = images[index].description;
+
+  lightbox.style.display = "flex";
+  setTimeout(() => lightbox.classList.add("show"), 10);  // เปิดแอนิเมชั่นภาพ
+  
+  // เก็บประวัติเมื่อคลิกการ์ด
+  addToHistory(card, index);
+}
+
+let cards = [];
+
+// สร้างการ์ดให้กับแต่ละรูปภาพ
+function createCards() {
+  const cardsContainer = document.getElementById("cardsContainer");
+  cardsContainer.innerHTML = '';  // ล้างการ์ดเดิม
+  images.forEach((img, index) => {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.dataset.index = index;
+    card.innerHTML = `<img src="${img.src}" alt="Card ${index + 1}">`;
+    card.addEventListener("click", () => selectCard(card, index));
+    cards.push(card);
+    cardsContainer.appendChild(card);
+  });
+}
+
+// เลือกการ์ด
+function selectCard(card, index) {
+  if (cardSelected) return; // ถ้าเลือกแล้วไม่ให้เลือกซ้ำ
+
+  card.classList.add("flipped");
+  cardSelected = true;
+
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxDescription = document.getElementById("lightboxDescription");
+
+  // แสดงข้อมูลการ์ดใน Lightbox
+  lightboxImage.src = images[index].src;
+  lightboxDescription.textContent = images[index].description;
+
+  lightbox.style.display = "flex";
+  setTimeout(() => lightbox.classList.add("show"), 10); // เปิดแอนิเมชั่นภาพ
+
+  // บันทึกประวัติ
+  addToHistory(card, index);
+}
+
+
+    // ปิด Lightbox
+    document.getElementById("lightbox").addEventListener("click", function() {
+      this.style.display = "none";
+      this.classList.remove("show");  // ปิดแอนิเมชั่นภาพ
+    });
+
+    // ฟังก์ชันสับไพ่
+    function shuffleCards() {
+      cards.forEach(card => {
+        card.classList.add("shuffling");  // เพิ่มอนิเมชั่นสับไพ่
+      });
+
+      setTimeout(() => {
+        // สลับการ์ด
+        cards.sort(() => Math.random() - 0.5); // สุ่มการ์ด
+        const cardsContainer = document.getElementById("cardsContainer");
+        cardsContainer.innerHTML = '';  // ลบการ์ดเดิม
+        cards.forEach(card => {
+          cardsContainer.appendChild(card); // แสดงการ์ดใหม่ที่สลับที่กัน
+        });
+
+        // ปิดการ์ดทั้งหมด
+        cards.forEach(card => card.classList.remove("flipped"));
+        cardSelected = false;  // รีเซ็ตสถานะการเลือกการ์ด
+      }, 800); // สับไพ่หลังจาก 0.8 วินาที
+    }
+  </script>
+</body>
+</html>
